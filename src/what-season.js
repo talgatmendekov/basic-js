@@ -11,32 +11,44 @@ const { NotImplementedError } = require('../extensions/index.js');
  * getSeason(new Date(2020, 02, 31)) => 'spring'
  * 
  */
+
+
 function getSeason(date) {
-  if (!date) {
-    throw new Error("Invalid date!");
-}
 
-// Check if the provided date is a valid Date object
-if (!(date instanceof Date) || isNaN(date)) {
-    throw new Error("Invalid date!");
-}
-
-const month = date.getMonth();
-const seasons = {
-    'spring': [2, 3, 4],
-    'summer': [5, 6, 7],
-    'autumn': [8, 9, 10],
-    'winter': [11, 0, 1]
-};
-
-for (const season in seasons) {
-    if (seasons[season].includes(month)) {
-        return season;
+    
+    if (date === undefined || date === null) {
+        console.log('Input is undefined or null');
+        return 'Unable to determine the time of year!';
     }
-}
+    const getTimestamp = () => new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds()).getTime();
+    const proxyDate = {
+        getMonth: () => new Date(getTimestamp()).getMonth(),
+        getFullYear: () => new Date(getTimestamp()).getFullYear(),
+        getDate: () => new Date(getTimestamp()).getDate(),
+        getHours: () => new Date(getTimestamp()).getHours(),
+        getMinutes: () => new Date(getTimestamp()).getMinutes(),
+        getSeconds: () => new Date(getTimestamp()).getSeconds(),
+        getMilliseconds: () => new Date(getTimestamp()).getMilliseconds(),
+        getDay: () => new Date(getTimestamp()).getDay(),
+        [Symbol.toStringTag]: 'Date'
+    };
 
-throw new Error("Invalid date!");
-}
+    try {
+        const month = proxyDate.getMonth() + 1;  // Adjusting for JavaScript's 0-indexed months
+
+        if (month >= 3 && month <= 5) {
+            return 'spring';
+        } else if (month >= 6 && month <= 8) {
+            return 'summer';
+        } else if (month >= 9 && month <= 11) {
+            return 'autumn';
+        } else {
+            return 'winter';
+        }
+    } catch (error) {
+        throw new Error("Invalid date!");
+    }
+  }
 
 module.exports = {
   getSeason
